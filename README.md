@@ -1,4 +1,3 @@
-Warning: fs was declared with const; use let for reassignable variables.
 # Robodog ROS 2 Humble workspace
 
 This workspace is a ROS 2 Humble migration of the supplied `open_quadruped`
