@@ -20,6 +20,7 @@
               matname="orange"
               meshfile="package://open_quadruped/urdf/stl/OpenQuadruped/MAINBODY.stl"
               meshscale="1 1 1" /> <!-- m to mm -->
+  <gazebo reference="base_inertia"><gravity>true</gravity></gazebo>
 
   <!-- BATTERY -->
   <xacro:mesh_link name="battery"
@@ -131,9 +132,9 @@
                     axis_xyz="1 0 0"
                     origin_rpy="0 0 0" origin_xyz="${0.2515-0.16} ${0.0044+0.035} ${0.067-0.045}"
                     parent="front_bracket" child="front_left_hip"
-                    effort="4.0" velocity="4.0"
-                    damping="0.0"
-                    friction="0.0"
+                    effort="20.0" velocity="4.0"
+                    damping="0.20"
+                    friction="0.02"
                     lower="-1.04"
                     upper="1.04"/>
   <!-- UPPER LEG -->
@@ -152,9 +153,9 @@
                     axis_xyz="0 1 0"
                     origin_rpy="0 0 0" origin_xyz="0.0015 0.045 -0.0087"
                     parent="front_left_hip" child="front_left_upper_leg"
-                    effort="4.0" velocity="4.0"
-                    damping="0.0"
-                    friction="0.0"
+                    effort="20.0" velocity="4.0"
+                    damping="0.20"
+                    friction="0.02"
                     lower="${-pi/2}"
                     upper="2.59"/>
   <!-- LOWER LEG -->
@@ -173,16 +174,16 @@
                     axis_xyz="0 1 0"
                     origin_rpy="0 0 0" origin_xyz="-0.005 0.018 -0.109"
                     parent="front_left_upper_leg" child="front_left_lower_leg"
-                    effort="4.0" velocity="4.0"
-                    damping="0.0"
-                    friction="0.0"
+                    effort="20.0" velocity="4.0"
+                    damping="0.20"
+                    friction="0.02"
                     lower="-2.9"
                     upper="${pi/2}"/>
   <!-- FOOT -->
   <xacro:mesh_link_sphere name="front_left_foot"
               origin_rpy="0 0 ${pi/2}" origin_xyz="${-0.247} ${-0.068} ${0.18}"
               i_rpy="0 0 0" i_xyz="0 0 0"
-              mass="0.005"
+              mass="0.05"
               c_xyz="${-0.247} ${-0.068} ${0.18}"
               length="0.05"
               width="0.065"
@@ -212,9 +213,9 @@
                     axis_xyz="1 0 0"
                     origin_rpy="0 0 0" origin_xyz="${-0.2515+0.115} ${0.0044+0.035} ${0.067-0.045}"
                     parent="back_bracket" child="back_left_hip"
-                    effort="4.0" velocity="4.0"
-                    damping="0.0"
-                    friction="0.0"
+                    effort="20.0" velocity="4.0"
+                    damping="0.20"
+                    friction="0.02"
                     lower="-1.04"
                     upper="1.04"/>
   <!-- UPPER LEG -->
@@ -233,9 +234,9 @@
                     axis_xyz="0 1 0"
                     origin_rpy="0 0 0" origin_xyz="0.0015 0.045 -0.0087"
                     parent="back_left_hip" child="back_left_upper_leg"
-                    effort="4.0" velocity="4.0"
-                    damping="0.0"
-                    friction="0.0"
+                    effort="20.0" velocity="4.0"
+                    damping="0.20"
+                    friction="0.02"
                     lower="${-pi/2}"
                     upper="2.59"/>
   <!-- LOWER LEG -->
@@ -254,16 +255,16 @@
                     axis_xyz="0 1 0"
                     origin_rpy="0 0 0" origin_xyz="-0.005 0.018 -0.109"
                     parent="back_left_upper_leg" child="back_left_lower_leg"
-                    effort="4.0" velocity="4.0"
-                    damping="0.0"
-                    friction="0.0"
+                    effort="20.0" velocity="4.0"
+                    damping="0.20"
+                    friction="0.02"
                     lower="-2.9"
                     upper="${pi/2}"/>
   <!-- FOOT -->
   <xacro:mesh_link_sphere name="back_left_foot"
               origin_rpy="0 0 ${pi/2}" origin_xyz="${-0.247} ${-0.068} ${0.18}"
               i_rpy="0 0 0" i_xyz="0 0 0"
-              mass="0.005"
+              mass="0.05"
               c_xyz="${-0.247} ${-0.068} ${0.18}"
               length="0.05"
               width="0.065"
@@ -293,9 +294,9 @@
                     axis_xyz="1 0 0"
                     origin_rpy="0 0 0" origin_xyz="${0.2515-0.16} ${-(0.0044+0.035)} ${0.067-0.045}"
                     parent="front_bracket" child="front_right_hip"
-                    effort="4.0" velocity="4.0"
-                    damping="0.0"
-                    friction="0.0"
+                    effort="20.0" velocity="4.0"
+                    damping="0.20"
+                    friction="0.02"
                     lower="-1.04"
                     upper="1.04"/>
   <!-- UPPER LEG -->
@@ -314,9 +315,9 @@
                     axis_xyz="0 1 0"
                     origin_rpy="0 0 0" origin_xyz="0.0015 -0.045 -0.0087"
                     parent="front_right_hip" child="front_right_upper_leg"
-                    effort="4.0" velocity="4.0"
-                    damping="0.0"
-                    friction="0.0"
+                    effort="20.0" velocity="4.0"
+                    damping="0.20"
+                    friction="0.02"
                     lower="${-pi/2}"
                     upper="2.59"/>
   <!-- LOWER LEG -->
@@ -335,7 +336,7 @@
                     axis_xyz="0 1 0"
                     origin_rpy="0 0 0" origin_xyz="-0.005 -0.018 -0.109"
                     parent="front_right_upper_leg" child="front_right_lower_leg"
-                    effort="4.0" velocity="4.0"
+                    effort="20.0" velocity="4.0"
                     damping="0.0"
                     friction="0.0"
                     lower="-2.9"
@@ -344,7 +345,7 @@
   <xacro:mesh_link_sphere name="front_right_foot"
               origin_rpy="0 0 ${pi/2}" origin_xyz="${-0.247} ${0.138} ${0.18}"
               i_rpy="0 0 0" i_xyz="0 0 0"
-              mass="0.005"
+              mass="0.05"
               c_xyz="${-0.247} ${0.138} ${0.18}"
               length="0.05"
               width="0.065"
@@ -374,7 +375,7 @@
                     axis_xyz="1 0 0"
                     origin_rpy="0 0 0" origin_xyz="${-0.2515+0.115} ${-(0.0044+0.035)} ${0.067-0.045}"
                     parent="back_bracket" child="back_right_hip"
-                    effort="4.0" velocity="4.0"
+                    effort="20.0" velocity="4.0"
                     damping="0.0"
                     friction="0.0"
                     lower="-1.04"
@@ -395,7 +396,7 @@
                     axis_xyz="0 1 0"
                     origin_rpy="0 0 0" origin_xyz="0.0015 -0.045 -0.0087"
                     parent="back_right_hip" child="back_right_upper_leg"
-                    effort="4.0" velocity="4.0"
+                    effort="20.0" velocity="4.0"
                     damping="0.0"
                     friction="0.0"
                     lower="${-pi/2}"
@@ -416,7 +417,7 @@
                     axis_xyz="0 1 0"
                     origin_rpy="0 0 0" origin_xyz="-0.005 -0.018 -0.109"
                     parent="back_right_upper_leg" child="back_right_lower_leg"
-                    effort="4.0" velocity="4.0"
+                    effort="20.0" velocity="4.0"
                     damping="0.0"
                     friction="0.0"
                     lower="-2.9"
@@ -425,7 +426,7 @@
   <xacro:mesh_link_sphere name="back_right_foot"
               origin_rpy="0 0 ${pi/2}" origin_xyz="${-0.247} ${0.138} ${0.18}"
               i_rpy="0 0 0" i_xyz="0 0 0"
-              mass="0.005"
+              mass="0.05"
               c_xyz="${-0.247} ${0.138} ${0.18}"
               length="0.05"
               width="0.065"
@@ -541,6 +542,7 @@
   </ros2_control>
 
   <gazebo>
+    <self_collide>false</self_collide>
     <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
       <robot_param>robot_description</robot_param>
       <robot_param_node>robot_state_publisher</robot_param_node>
