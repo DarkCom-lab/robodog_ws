@@ -1,4 +1,4 @@
-"""Start the Gazebo simulation with terminal Cartesian foot control."""
+"""Start Gazebo with the keyboard locomotion controller."""
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -10,8 +10,6 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('gui', default_value='true'),
-        DeclareLaunchArgument('gain_m', default_value='0.01'),
-        DeclareLaunchArgument('z_lift_m', default_value='0.02'),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(PathJoinSubstitution([
                 FindPackageShare('open_quadruped'), 'launch', 'sim.launch.py'
@@ -30,14 +28,10 @@ def generate_launch_description():
         ),
         Node(
             package='open_quadruped',
-            executable='keyboard_foot_control.py',
-            name='keyboard_foot_control',
+            executable='keyboard_gait.py',
+            name='keyboard_gait',
             output='screen',
             emulate_tty=True,
-            parameters=[{
-                'use_sim_time': True,
-                'gain_m': LaunchConfiguration('gain_m'),
-                'z_lift_m': LaunchConfiguration('z_lift_m'),
-            }],
+            parameters=[{'use_sim_time': True}],
         ),
     ])
