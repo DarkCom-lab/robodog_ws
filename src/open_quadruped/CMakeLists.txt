@@ -15,12 +15,15 @@ install(PROGRAMS
   nodes/joint_angles_to_trajectory.py
   nodes/keyboard_foot_control.py
   nodes/crawl_gait_coordinator.py
+  nodes/stand_controller.py
+  nodes/keyboard_gait.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(DIRECTORY
   config
   launch
+  worlds
   urdf
   DESTINATION share/${PROJECT_NAME}
 )
