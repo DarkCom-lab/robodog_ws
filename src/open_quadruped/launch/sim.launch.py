@@ -103,8 +103,16 @@ def launch_setup(context, *args, **kwargs):
             '-entity', 'open_quadruped',
             '-x', '0.0',
             '-y', '0.0',
-            '-z', '0.30',
+            '-z', '0.2422',
         ],
+    )
+
+    stand_controller = Node(
+        package='open_quadruped',
+        executable='stand_controller.py',
+        name='stand_controller',
+        output='screen',
+        parameters=[{'use_sim_time': True}],
     )
 
     # --------------------------------------------------
@@ -193,6 +201,7 @@ def launch_setup(context, *args, **kwargs):
     return [
         robot_state_publisher,
         spawn_robot,
+        stand_controller,
         joy_node,
         interface_node,
         trajectory_bridge,
@@ -216,8 +225,11 @@ def generate_launch_description():
     # which prevents Gazebo from loading the ROS factory plugin.  Keep the
     # same official plugins, but pass each option and value as separate argv
     # entries so /spawn_entity is guaranteed to be created.
-    gazebo_ros_share = get_package_share_directory('gazebo_ros')
-    gazebo_world = os.path.join(gazebo_ros_share, 'worlds', 'empty.world')
+    gazebo_world = os.path.join(
+        get_package_share_directory('open_quadruped'),
+        'worlds',
+        'robodog.world',
+    )
 
     # Both gzserver and gzclient must be able to resolve model:// mesh URIs.
     # The parent of the package share directory contains the
