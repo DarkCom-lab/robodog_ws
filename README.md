@@ -88,11 +88,12 @@ To start without the Gazebo GUI:
 ros2 launch open_quadruped sim.launch.py gui:=false
 ```
 
-## Keyboard foot control (simulation)
+## Keyboard locomotion control (simulation)
 
-This experimental mode selects one leg and moves its foot in the robot's X/Y
-plane using inverse kinematics. It starts Gazebo without the joystick pipeline
-and initializes the foot targets from TF.
+The keyboard controller generates a sequential four-phase crawl in foot space.
+It reads all four foot positions from TF, creates planted-foot stance motion and
+lifted swing motion, solves each foot target with the existing leg IK model,
+and sends the resulting 12 joint targets through the existing trajectory bridge.
 
 ```bash
 source /opt/ros/humble/setup.bash
@@ -100,15 +101,38 @@ source ~/robodog_ws/install/setup.bash
 ros2 launch open_quadruped keyboard_sim.launch.py
 ```
 
+Controls:
+
+- **W / S** — forward / backward.
+- **A / D** — turn left / right in place.
+- **Q / E** — strafe left / right.
+- **Space / X** — decelerate and stop when all four feet are down.
+- **+ / -** — increase / decrease the speed scale.
+- **Esc** — stop safely and exit.
+
+The starting values are deliberately conservative: 1.2 s stride period, 82%
+stance ratio, 15 mm swing height, 0.04 m/s maximum forward speed,
+0.025 m/s maximum lateral speed and 0.35 rad/s maximum yaw rate. The phase
+order is FL, BR, FR, BL, with at most one foot in swing at a time. These are
+simulation test values, not measured hardware performance.
+
+The gait uses body-twist kinematics. A planted foot moves backward relative
+to the body for forward motion. A yaw command generates tangential X/Y foot
+motion around the body; hip-roll oscillation alone is not used as a turning
+command. This open-loop first version does not yet use IMU feedback or
+measured contact forces, so speed should remain low until the Gazebo tests
+confirm stable contact and positive body displacement.
+
+## Keyboard foot control (simulation diagnostic)
+
+`keyboard_foot_control.py` is a separate single-leg IK diagnostic. It is not
+the locomotion node launched by `keyboard_sim.launch.py`. Use it only when
+Gazebo and `joint_angles_to_trajectory` are already running, and do not run it
+at the same time as `keyboard_gait.py`.
+
 Select FL/FR/BL/BR with **1/2/3/4**. Arrow keys (or **W/A/S/D**) move the
-selected foot along X or Y by `gain_m` (default 0.01 m); the path raises it by `z_lift_m` (default
-0.02 m), then returns it to its starting Z at the destination. Press **q** to
-quit. Set the move distance, for example, with
-`ros2 launch open_quadruped keyboard_sim.launch.py gain_m:=0.02`. Adjust the
-temporary lift with `z_lift_m:=0.03`. To run without the Gazebo GUI, add
-`gui:=false`. This is
-simulation-only; the real hardware transport is not implemented in this
-workspace.
+selected foot in the base X/Y plane by `gain_m` (default 0.01 m), with a
+temporary `z_lift_m` (default 0.02 m).
 
 ## Crawl gait coordinator (simulation)
 
@@ -144,19 +168,20 @@ Gazebo before further tuning. See [the static gait study](https://pmc.ncbi.nlm.n
 ## Topics and control flow
 
 ```text
-USB joystick
-    │
-    ▼
-/joy  (sensor_msgs/msg/Joy)
-    │
-    ▼
-interface_process
-    │  body-pose inverse kinematics
-    ▼
-/joint_angles  (open_quadruped/msg/JointAngles)
-    │
-    ▼
-joint_angles_to_trajectory
+USB joystick                         Keyboard
+    │                                  │
+    ▼                                  ▼
+/joy (sensor_msgs/msg/Joy)        keyboard_gait
+    │                             foot paths + leg IK
+    ▼                                  │
+interface_process ────────────────────┤
+    │ body-pose IK                    │
+    └──────────────┬───────────────────┘
+                   ▼
+          /joint_angles (JointAngles)
+                   │
+                   ▼
+       joint_angles_to_trajectory
     │
     ▼
 /quadruped_controller/joint_trajectory
