@@ -2,7 +2,14 @@
 """Pure-math regression tests for keyboard foot-space crawl gait generation."""
 
 import math
+from pathlib import Path
+import sys
 import unittest
+
+# Permit running the test directly from a clean checkout without sourcing
+# the colcon install environment.
+LIBRARY_ROOT = Path(__file__).resolve().parents[2] / "control_library"
+sys.path.insert(0, str(LIBRARY_ROOT))
 
 from control_library import velocity_gait
 
