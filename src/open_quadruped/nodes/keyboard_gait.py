@@ -38,7 +38,7 @@ HIP_ORIGINS = {
     "bl": (-0.1365, 0.0394, 0.022),
     "br": (-0.1365, -0.0394, 0.022),
 }
-# FL+BR and FR+BL are the two diagonal pairs.
+# Quarter-cycle offsets produce a sequential FL, BR, FR, BL crawl.
 PHASE_OFFSETS = {"fl": 0.75, "br": 0.50, "fr": 0.25, "bl": 0.0}
 JOINT_LIMITS = (
     (-1.04, 1.04),
