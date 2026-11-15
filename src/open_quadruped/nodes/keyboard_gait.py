@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Keyboard teleoperation using foot-space inverse kinematics."""
+"""Keyboard teleoperation using a statically conservative crawl gait."""
 
 import math
 import os
@@ -39,7 +39,7 @@ HIP_ORIGINS = {
     "br": (-0.1365, -0.0394, 0.022),
 }
 # FL+BR and FR+BL are the two diagonal pairs.
-PHASE_OFFSETS = {"fl": 0.0, "br": 0.0, "fr": 0.5, "bl": 0.5}
+PHASE_OFFSETS = {"fl": 0.75, "br": 0.50, "fr": 0.25, "bl": 0.0}
 JOINT_LIMITS = (
     (-1.04, 1.04),
     (-math.pi / 2.0, 2.59),
@@ -51,8 +51,8 @@ class KeyboardGait(Node):
     def __init__(self):
         super().__init__("keyboard_gait")
         self.declare_parameter("step_period_sec", 1.2)
-        self.declare_parameter("stance_ratio", 0.65)
-        self.declare_parameter("swing_height_m", 0.02)
+        self.declare_parameter("stance_ratio", 0.82)
+        self.declare_parameter("swing_height_m", 0.015)
         self.declare_parameter("publish_rate_hz", 50.0)
         self.declare_parameter("base_frame", "base_link")
         self.declare_parameter("joint_angles_topic", "/joint_angles")
@@ -195,7 +195,7 @@ class KeyboardGait(Node):
     def request_stop(self):
         if self.movement_active:
             self.set_command()
-            self.get_logger().info("Decelerating gait; will stop in diagonal double support.")
+            self.get_logger().info("Decelerating gait; will stop when all four feet are down.")
 
     def handle_key(self, key):
         key = key.lower()
@@ -273,7 +273,7 @@ class KeyboardGait(Node):
         self.phase = 0.0
         self.movement_active = False
         self.stopping = False
-        self.get_logger().info("Gait stopped; controller holds the measured standing pose.")
+        self.get_logger().info("Crawl stopped in all-feet stance; controller holds the measured pose.")
 
     def _tick(self):
         if not self.ready and not self._initialize():
@@ -299,8 +299,7 @@ class KeyboardGait(Node):
         lateral = self.active_twist[1] * self.speed_scale * self.max_lateral_speed
         yaw_rate = self.active_twist[2] * self.speed_scale * self.max_yaw_rate
         stance_duration = self.step_period * self.stance_ratio
-        lift_scale = min(1.0, max(abs(value) for value in self.active_twist))
-
+        
         targets = {}
         try:
             for leg in LEGS:
@@ -320,7 +319,7 @@ class KeyboardGait(Node):
                     dx,
                     dy,
                     self.stance_ratio,
-                    self.swing_height * lift_scale,
+                    self.swing_height,
                 )
                 targets[leg] = [
                     home[0] + offset[0],
@@ -338,7 +337,7 @@ class KeyboardGait(Node):
         if (
             self.stopping
             and max(abs(value) for value in self.active_twist) < 1e-3
-            and velocity_gait.in_diagonal_double_support(self.phase, self.stance_ratio)
+            and velocity_gait.in_all_feet_stance(self.phase, PHASE_OFFSETS, self.stance_ratio)
         ):
             self._finish_stop()
 
