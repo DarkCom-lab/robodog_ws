@@ -25,8 +25,8 @@
       <uri>model://sun</uri>
     </include>
 
-    <!-- Do not include Gazebo's default ground_plane: its mu=100/mu2=50
-         values are inappropriate for this contact-stability test. -->
+    <!-- Use a moderate initial friction coefficient that matches the foot.
+         This is a simulation test value, not measured physical rubber data. -->
     <model name="ground_plane">
       <static>true</static>
       <link name="link">
@@ -43,7 +43,7 @@
             </contact>
             <friction>
               <ode>
-                <mu>0.1</mu>
+                <mu>1.0</mu>
                 <mu2>0.1</mu2>
               </ode>
             </friction>
