@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Pure-math regression tests for keyboard foot-space gait generation."""
+"""Pure-math regression tests for keyboard foot-space crawl gait generation."""
 
 import math
 import unittest
 
 from control_library import velocity_gait
+
+
+PHASE_OFFSETS = {"fl": 0.75, "br": 0.50, "fr": 0.25, "bl": 0.0}
 
 
 class VelocityGaitTest(unittest.TestCase):
@@ -26,34 +29,46 @@ class VelocityGaitTest(unittest.TestCase):
         self.assertLess(br[0], 0.0)
         self.assertGreater(br[1], 0.0)
 
-    def test_each_diagonal_pair_starts_at_zero_offset(self):
-        for phase_offset in (0.0, 0.5):
+    def test_each_crawl_leg_starts_at_measured_position(self):
+        for offset in PHASE_OFFSETS.values():
             actual = velocity_gait.relative_foot_path(
-                0.0, phase_offset, -0.03, 0.02, 0.65, 0.02
+                0.0, offset, -0.03, 0.02, 0.82, 0.015
             )
             self.assertEqual(actual, (0.0, 0.0, 0.0))
 
     def test_swing_lifts_foot(self):
-        stance = velocity_gait.sample_foot_path(0.25, -0.03, 0.01, 0.65, 0.02)
-        swing_midpoint = velocity_gait.sample_foot_path(0.825, -0.03, 0.01, 0.65, 0.02)
+        stance = velocity_gait.sample_foot_path(0.25, -0.03, 0.01, 0.82, 0.015)
+        swing_midpoint = velocity_gait.sample_foot_path(0.91, -0.03, 0.01, 0.82, 0.015)
         self.assertEqual(stance[2], 0.0)
-        self.assertAlmostEqual(swing_midpoint[2], 0.02)
+        self.assertAlmostEqual(swing_midpoint[2], 0.015)
 
     def test_stance_swing_boundary_is_continuous(self):
-        left = velocity_gait.sample_foot_path(0.65, -0.03, 0.02, 0.65, 0.02)
-        right = velocity_gait.sample_foot_path(0.65 + 1e-9, -0.03, 0.02, 0.65, 0.02)
+        left = velocity_gait.sample_foot_path(0.82, -0.03, 0.02, 0.82, 0.015)
+        right = velocity_gait.sample_foot_path(0.82 + 1e-9, -0.03, 0.02, 0.82, 0.015)
         for lhs, rhs in zip(left, right):
             self.assertAlmostEqual(lhs, rhs, places=8)
 
-    def test_diagonal_double_support_windows(self):
-        self.assertTrue(velocity_gait.in_diagonal_double_support(0.05, 0.65))
-        self.assertTrue(velocity_gait.in_diagonal_double_support(0.55, 0.65))
-        self.assertFalse(velocity_gait.in_diagonal_double_support(0.25, 0.65))
-        self.assertFalse(velocity_gait.in_diagonal_double_support(0.80, 0.65))
+    def test_at_most_one_leg_swings_and_three_remain_in_stance(self):
+        for index in range(1000):
+            phase = index / 1000.0
+            self.assertLessEqual(
+                velocity_gait.maximum_swinging_legs(phase, PHASE_OFFSETS, 0.82),
+                1,
+            )
+
+    def test_safe_all_feet_down_stop_windows_exist(self):
+        for phase in (0.0, 0.25, 0.5, 0.75):
+            self.assertTrue(
+                velocity_gait.in_all_feet_stance(phase, PHASE_OFFSETS, 0.82)
+            )
+        for phase in (0.1, 0.35, 0.6, 0.85):
+            self.assertFalse(
+                velocity_gait.in_all_feet_stance(phase, PHASE_OFFSETS, 0.82)
+            )
 
     def test_cycle_wrap_is_continuous(self):
-        start = velocity_gait.sample_foot_path(0.0, -0.03, 0.02, 0.65, 0.02)
-        end = velocity_gait.sample_foot_path(1.0, -0.03, 0.02, 0.65, 0.02)
+        start = velocity_gait.sample_foot_path(0.0, -0.03, 0.02, 0.82, 0.015)
+        end = velocity_gait.sample_foot_path(1.0, -0.03, 0.02, 0.82, 0.015)
         for lhs, rhs in zip(start, end):
             self.assertTrue(math.isclose(lhs, rhs, abs_tol=1e-12))
 
