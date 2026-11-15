@@ -48,9 +48,10 @@
       </inertial>
     </link>
     <gazebo reference="${name}">
-        <!-- The imported meshes are visual assets; their legacy collision
-             frames are not physically consistent with the link frames. -->
-        <gravity>false</gravity>
+        <!-- These imported meshes remain visual-only because their legacy
+             collision frames are not yet validated. Gravity remains enabled so
+             the feet support the weight of the complete articulated robot. -->
+        <gravity>true</gravity>
         <collide_bitmask>0x0</collide_bitmask>
         <xacro:if value="${matname == 'black'}">
           <material>Gazebo/Black</material>
@@ -79,8 +80,8 @@
         <surface>
           <friction>
             <ode>
-              <mu>0.1</mu>
-              <mu2>0.1</mu2>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
             </ode>
           </friction>
         </surface>
@@ -99,7 +100,7 @@
       <!-- Keep the foot penalty contact soft enough for the 1 ms ODE step. -->
       <kp>1000.0</kp>
       <kd>100.0</kd>
-      <mu1>0.1</mu1>
+      <mu1>1.0</mu1>
       <mu2>0.1</mu2>
       <maxVel>0.02</maxVel>
       <minDepth>0.0001</minDepth>
