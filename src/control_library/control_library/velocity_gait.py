@@ -1,8 +1,8 @@
-"""Planar body-twist to foot-space gait primitives.
+"""Planar body-twist to foot-space crawl gait primitives.
 
 Coordinates use the robot base frame: +X forward, +Y left, +Z up.
 During stance, a planted foot moves backward relative to a translating or
-rotating body. Swing returns the foot to its next foothold.
+rotating body. During swing it returns to its next foothold.
 """
 
 import math
@@ -31,7 +31,7 @@ def stance_displacement(foot_xy, velocity_x, velocity_y, yaw_rate, stance_durati
     return ((-vx + wz * y) * duration, (-vy - wz * x) * duration)
 
 
-def sample_foot_path(phase, dx, dy, stance_ratio=0.65, swing_height=0.02):
+def sample_foot_path(phase, dx, dy, stance_ratio=0.82, swing_height=0.015):
     """Sample one closed stance/swing cycle as x/y offsets and z lift."""
     phase, dx, dy, stance_ratio, swing_height = map(
         float, (phase, dx, dy, stance_ratio, swing_height)
@@ -58,8 +58,8 @@ def sample_foot_path(phase, dx, dy, stance_ratio=0.65, swing_height=0.02):
 
 
 def relative_foot_path(global_phase, phase_offset, dx, dy,
-                       stance_ratio=0.65, swing_height=0.02):
-    """Return a phase-shifted foot path whose first sample is exactly zero."""
+                       stance_ratio=0.82, swing_height=0.015):
+    """Return a phase-shifted path whose initial offset is exactly zero."""
     phase = (float(global_phase) + float(phase_offset)) % 1.0
     initial_phase = float(phase_offset) % 1.0
     current = sample_foot_path(phase, dx, dy, stance_ratio, swing_height)
@@ -67,9 +67,20 @@ def relative_foot_path(global_phase, phase_offset, dx, dy,
     return tuple(current[i] - initial[i] for i in range(3))
 
 
-def in_diagonal_double_support(phase, stance_ratio=0.65):
-    """Return true while both diagonal pairs are in stance."""
-    phase = float(phase) % 1.0
-    _require_finite(phase, stance_ratio)
-    other_phase = (phase + 0.5) % 1.0
-    return phase < stance_ratio and other_phase < stance_ratio
+def in_all_feet_stance(global_phase, phase_offsets, stance_ratio=0.82):
+    """True only during windows where all feet are on the ground."""
+    phase = float(global_phase) % 1.0
+    ratio = float(stance_ratio)
+    _require_finite(phase, ratio, *phase_offsets.values())
+    if not 0.0 < ratio < 1.0:
+        raise ValueError("stance_ratio must be between zero and one")
+    return all(((phase + offset) % 1.0) < ratio for offset in phase_offsets.values())
+
+
+def maximum_swinging_legs(global_phase, phase_offsets, stance_ratio=0.82):
+    """Count legs currently in swing; used by tests to verify 3-leg support."""
+    phase = float(global_phase) % 1.0
+    ratio = float(stance_ratio)
+    _require_finite(phase, ratio, *phase_offsets.values())
+    return sum(1 for offset in phase_offsets.values()
+               if ((phase + offset) % 1.0) >= ratio)
