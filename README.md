@@ -182,12 +182,12 @@ interface_process ────────────────────�
                    │
                    ▼
        joint_angles_to_trajectory
-    │
-    ▼
-/quadruped_controller/joint_trajectory
-    │
-    ▼
-ros2_control / Gazebo Classic
+                   │
+                   ▼
+  /quadruped_controller/joint_trajectory
+                   │
+                   ▼
+       ros2_control / Gazebo Classic
 ```
 
 Useful checks:
