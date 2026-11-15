@@ -134,10 +134,12 @@ ros2 run open_quadruped crawl_gait_coordinator.py --ros-args \
 
 Use only one foot-command node at a time.
 
-The current Gazebo model disables link gravity and collision response, so this
-validates gait timing and IK only; it will not translate the body across the
-ground. Actual static walking stability also depends on the center of mass
-remaining inside the three-foot support polygon. See [the static gait study](https://pmc.ncbi.nlm.nih.gov/articles/PMC7506578/).
+The current model enables gravity on every massive link, keeps imported
+non-foot meshes collision-disabled pending link-by-link validation, and uses
+spherical foot collision proxies. Foot and ground friction are both set to
+1.0 as an initial traction test value; this coefficient is not a measured
+property of the physical foot material. Validate contact forces and slip in
+Gazebo before further tuning. See [the static gait study](https://pmc.ncbi.nlm.nih.gov/articles/PMC7506578/).
 
 ## Topics and control flow
 
